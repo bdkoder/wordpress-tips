@@ -158,3 +158,17 @@ function custom_register_jquery() {
 <?php
 }
 ```
+
+### check if user looged in
+```php
+function _is_user_logged_in() {
+  $current_user = wp_get_current_user();
+  if (0 == $current_user->ID) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+echo _is_user_logged_in();
+```
