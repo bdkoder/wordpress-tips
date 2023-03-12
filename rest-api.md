@@ -1,9 +1,9 @@
 ### Important
 
 ```php
-$body = wp_remote_request( $market_url );
-$body = wp_remote_retrieve_body( $body );
-$data = json_decode($body);
+$url_request = wp_remote_request( $url );
+$data_body = wp_remote_retrieve_body( $url_request );
+$data = json_decode($data_body);
 ```
 
 
