@@ -1,3 +1,12 @@
+### Important
+
+```php
+$body = wp_remote_request( $market_url );
+$body = wp_remote_retrieve_body( $body );
+$data = json_decode($body);
+```
+
+
 ### Insert data into WordPress database table from a custom rest api 
 
 ```php
