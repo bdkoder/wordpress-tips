@@ -1,1 +1,1 @@
-# wordpress-tips
+# Wordpress Tips
