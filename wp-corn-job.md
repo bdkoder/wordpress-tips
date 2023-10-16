@@ -1,4 +1,51 @@
-### Run Corn Job in Every 5 minutes [WordPress]
+### Run Corn Job in Every 5 minutes [WordPress Propr Class]
+```php
+class CustomCronJob {
+
+    public function __construct() {
+        add_action('init', array($this, 'createFileWithinWpContent'));
+
+        add_filter('cron_schedules', array($this, 'addEveryFiveMinutes'));
+
+        if (!wp_next_scheduled('isa_add_every_five_minutes')) {
+            wp_schedule_event(time(), 'every_five_minutes', 'isa_add_every_five_minutes');
+        }
+
+        add_action('isa_add_every_five_minutes', array($this, 'createFileWithinWpContent'));
+
+        register_deactivation_hook(__FILE__, array($this, 'deactivate'));
+    }
+
+    public function createFileWithinWpContent() {
+        $time = current_datetime();
+        $time = $time->format('H-i-s');
+        $file = WP_CONTENT_DIR . '/test-' . $time . '.txt';
+
+        if (!file_exists($file)) {
+            $fp = fopen($file, 'w');
+            fwrite($fp, 'test');
+            fclose($fp);
+        }
+    }
+
+    public function addEveryFiveMinutes($schedules) {
+        $schedules['every_five_minutes'] = array(
+            'interval' => 300, // 5 minutes in seconds
+            'display' => __('Every 5 Minutes', 'textdomain')
+        );
+        return $schedules;
+    }
+
+    public function deactivate() {
+        $timestamp = wp_next_scheduled('isa_add_every_five_minutes');
+        wp_unschedule_event($timestamp, 'isa_add_every_five_minutes');
+    }
+}
+
+new CustomCronJob();
+```
+
+### Run Corn Job in Every 5 minutes [Basic Test Method]
 ```php
 
 function create_file_within_wp_content() {
