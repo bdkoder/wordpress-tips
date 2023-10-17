@@ -93,3 +93,132 @@ function isa_deactivate() {
 // print_r( _get_cron_array() );
 // echo '</pre>';
 ```
+
+### Multi Job
+```php
+
+/**
+ * Description of Corn
+ * 
+ * @since 0.0.0
+ */
+class Corn {
+	private static $instance = null;
+
+	/**
+	 * Get Instance
+	 * 
+	 * @since 0.0.0
+	 */
+	public static function get_instance() {
+		if ( ! isset( self::$instance ) ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+
+	/**
+	 * Construct
+	 * 
+	 * @since 0.0.0
+	 */
+	public function __construct() {
+		// Add your custom cron jobs here
+		$this->create_cron_job( 'custom_job_1', 30, 'custom_job_callback' ); // Runs every 5 minutes
+		$this->create_cron_job( 'custom_job_2', 300, 'custom_job_callback_2' ); // Runs every 10 minutes
+
+		register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
+	}
+
+	/**
+	 * Create a custom cron job
+	 * 
+	 * @param string $hook The unique hook name for this job.
+	 * @param int $interval The interval in seconds.
+	 * @param string $callback The name of the callback method.
+	 */
+	public function create_cron_job( $hook, $interval, $callback ) {
+		// Add a filter for custom schedule with the provided interval and $hook
+		add_filter( 'cron_schedules', function ($schedules) use ($hook, $interval) {
+			$schedules[ $hook ] = array(
+				'interval' => $interval,
+				'display'  => __( 'Custom Schedule', 'textdomain' )
+			);
+			return $schedules;
+		}, 10, 1 );
+
+		if ( ! wp_next_scheduled( $hook ) ) {
+			wp_schedule_event( time(), $hook, $hook ); // Use $hook for the schedule name
+		}
+
+		add_action( $hook, array( $this, $callback ) );
+	}
+
+	/**
+	 * Callback for your custom cron job
+	 */
+	public function custom_job_callback() {
+		// Your custom job logic here for task 1
+		$time = current_datetime();
+		$time = $time->format( 'H-i-s' );
+		$file = WP_CONTENT_DIR . '/test-' . $time . '.txt';
+
+		if ( ! file_exists( $file ) ) {
+			$fp = fopen( $file, 'w' );
+			fwrite( $fp, 'test' );
+			fclose( $fp );
+		}
+	}
+
+	/**
+	 * Callback for the second custom cron job
+	 */
+	public function custom_job_callback_2() {
+		// Your custom job logic here for task 2
+		// Implement the logic for your second task here
+		$time = current_datetime();
+		$time = $time->format( 'H-i-s' );
+		$file = WP_CONTENT_DIR . '/test-' . $time . '--2.txt';
+
+		if ( ! file_exists( $file ) ) {
+			$fp = fopen( $file, 'w' );
+			fwrite( $fp, 'test' );
+			fclose( $fp );
+		}
+	}
+
+	/**
+	 * Add a custom schedule
+	 * 
+	 * @param array $schedules The existing schedules.
+	 * @param int $interval The interval in seconds.
+	 * @return array The modified schedules.
+	 */
+	public function add_custom_schedule( $schedules ) {
+		print_r( $schedules );
+		$schedules['custom'] = array(
+			'interval' => 30, // Change the interval as needed
+			'display'  => __( 'Custom Schedule', 'textdomain' )
+		);
+
+		return $schedules;
+	}
+
+	/**
+	 * Deactivate and unschedule all custom cron jobs
+	 */
+	public function deactivate() {
+		$custom_jobs = array( 'custom_job_1', 'custom_job_2' ); // Add your custom job names
+
+		foreach ( $custom_jobs as $hook ) {
+			$timestamp = wp_next_scheduled( $hook );
+			wp_unschedule_event( $timestamp, $hook );
+		}
+	}
+}
+
+if ( class_exists( 'Corn' ) ) {
+	Corn::get_instance();
+}
+```
