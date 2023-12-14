@@ -1,2 +1,2 @@
 # Wordpress Tips
-Note: Almost every codes for test purpose.
+Note: Almost every codes for test purposes.
