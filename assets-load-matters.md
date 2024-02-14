@@ -20,6 +20,6 @@ add_action('wp_enqueue_scripts', function () {
             unset($wp_scripts->registered[$key]);
         }
     }
-}, 9999999999);
+}, 9999);
 
 ```
