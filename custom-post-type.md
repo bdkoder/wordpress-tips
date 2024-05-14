@@ -140,3 +140,56 @@ function get_group_control_query_posts() {
 	return $posts;
 }
 ```
+### Pages also merge
+
+```php
+
+
+if ( ! is_admin() ) {
+	add_action( 'init', function () {
+
+		$query_data = get_option( 'linkboss_custom_query', '' );
+		$post_type = isset ( $query_data['post_sources'] ) && ! empty ( $query_data['post_sources'] ) ? $query_data['post_sources'] : array ( 'post', 'page' );
+
+		$posts_args = array (
+			'numberposts' => 11,
+			'post_type' => $post_type,
+			'post_status' => array ( 'publish', 'draft', 'trash' ),
+			'tax_query' => array (
+				'relation' => 'OR',
+			),
+		);
+
+		$cat = $query_data['__categories'];
+		if ( ! empty ( $cat ) ) {
+			$posts_args['tax_query'] = array_merge( $posts_args['tax_query'], $cat );
+		}
+
+		$posts = get_posts( $posts_args );
+
+		// Query for pages without taxonomy filtering
+		$page_args = [ 
+			'post_type' => 'page',
+			'posts_per_page' => 10,
+			'post_status' => 'publish',
+		];
+
+		$pages = get_posts( $page_args );
+
+		// Merge the results
+		$all_posts = array_merge( $posts, $pages );
+
+		$all_posts = array_column( $all_posts, 'ID', 'post_title' );
+
+		if ( ! empty ( $all_posts ) ) {
+			echo '<pre>';
+			print_r( $all_posts );
+			echo '</pre>';
+		} else {
+			echo '<pre>';
+			echo 'No posts found';
+			echo '</pre>';
+		}
+	} );
+}
+```
