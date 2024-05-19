@@ -97,3 +97,30 @@ In this example, we're using the wp_remote_get() function to make a GET request 
 
 Note that the exact code that you use will depend on the plugin that you are using to add API key support to your WordPress site and the specific requirements of your application. This is just an example to give you an idea of how to make a REST API request with an API key in WordPress using PHP.
 
+### Elementor Help
+```php
+add_action("rest_api_init", function () {
+
+	register_rest_route(
+		"MyPlugin/v1",
+		"/(?P<id>\d+)/contentElementor",
+		[
+			"methods" => "GET",
+			"callback" => function (\WP_REST_Request $req) {
+
+				$contentElementor = "";
+
+				if (class_exists("\\Elementor\\Plugin")) {
+					$post_ID = $req->get_param("id");
+
+					$pluginElementor = \Elementor\Plugin::instance();
+					$contentElementor = $pluginElementor->frontend->get_builder_content_for_display($post_ID, false);
+				}
+
+
+				return $contentElementor;
+			},
+		]
+	);
+});
+```
