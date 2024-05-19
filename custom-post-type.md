@@ -194,6 +194,26 @@ if ( ! is_admin() ) {
 }
 ```
 
+### Custom Post Type with Category
+```php
+// custom post type 'movies' with category
+function create_post_type() {
+	register_post_type('movies',
+		array(
+			'labels' => array(
+				'name' => __('Movies'),
+				'singular_name' => __('Movie')
+			),
+			'public' => true,
+			'has_archive' => true,
+			'taxonomies' => array('category'),
+			'show_in_rest' => true,
+			'supports'     => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments' )
+		)
+	);
+}
+add_action('init', 'create_post_type');
+```
 ### Custom Post Type Response
 ```php
 function custom_publish_post_function( $post_id ) {
