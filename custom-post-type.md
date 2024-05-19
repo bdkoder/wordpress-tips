@@ -193,3 +193,17 @@ if ( ! is_admin() ) {
 	} );
 }
 ```
+
+### Custom Post Type Response
+```php
+function custom_publish_post_function( $post_id ) {
+	// Perform custom actions when a post is published
+	error_log( 'Post ID: ' . $post_id );
+}
+
+// default post type
+add_action( 'publish_post', 'custom_publish_post_function' );
+
+// 'movies' post type
+add_action( 'publish_movies', 'custom_publish_post_function' );
+```
